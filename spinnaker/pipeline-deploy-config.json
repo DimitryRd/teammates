@@ -1,0 +1,260 @@
+{
+  "appConfig": {},
+  "executionEngine": "v2",
+  "keepWaitingPipelines": true,
+  "lastModifiedBy": "anonymous",
+  "limitConcurrent": true,
+  "parallel": true,
+  "parameterConfig": [],
+  "stages": [
+    {
+      "clusters": [
+        {
+          "account": "local",
+          "application": "teammates",
+          "cloudProvider": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [],
+              "envFrom": [],
+              "envVars": [
+                {
+                  "name": "COMPONENT",
+                  "value": "backend"
+                },
+                {
+                  "name": "VERSION",
+                  "value": "${trigger['tag']}"
+                }
+              ],
+              "imageDescription": {
+                "account": "gcr",
+                "fromTrigger": true,
+                "imageId": "gcr.io/PROJECT/teammates:v.*",
+                "registry": "gcr.io",
+                "repository": "PROJECT/teammates",
+                "tag": "v.*"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "limits": {},
+              "name": "PROJECT-teammates",
+              "ports": [
+                {
+                  "containerPort": 8080,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "requests": {},
+              "volumeMounts": []
+            }
+          ],
+          "deployment": {
+            "deploymentStrategy": {
+              "rollingUpdate": {
+                "maxSurge": "100%",
+                "maxUnavailable": "0%"
+              },
+              "type": "RollingUpdate"
+            },
+            "enabled": true,
+            "minReadySeconds": 0,
+            "paused": false,
+            "revisionHistoryLimit": 2
+          },
+          "dnsPolicy": "ClusterFirst",
+          "events": [],
+          "freeFormDetails": "",
+          "initContainers": [],
+          "interestingHealthProviderNames": [
+            "KubernetesContainer",
+            "KubernetesPod"
+          ],
+          "loadBalancers": [
+            "teammates-stage"
+          ],
+          "namespace": "default",
+          "nodeSelector": {},
+          "podAnnotations": {},
+          "provider": "kubernetes",
+          "region": "default",
+          "replicaSetAnnotations": {
+            "deployment.kubernetes.io/desired-replicas": "4",
+            "deployment.kubernetes.io/max-replicas": "8",
+            "deployment.kubernetes.io/revision": "28"
+          },
+          "securityGroups": [],
+          "stack": "stage",
+          "strategy": "",
+          "targetSize": 1,
+          "terminationGracePeriodSeconds": 30,
+          "volumeSources": []
+        }
+      ],
+      "name": "Deploy Stage",
+      "refId": "3",
+      "requisiteStageRefIds": [],
+      "type": "deploy"
+    },
+    {
+      "account": "local",
+      "annotations": {},
+      "application": "teammates",
+      "cloudProvider": "kubernetes",
+      "cloudProviderType": "kubernetes",
+      "containers": [
+        {
+          "args": [],
+          "command": [
+            "curl",
+            "http://teammates-stage:80"
+          ],
+          "envFrom": [],
+          "envVars": [],
+          "imageDescription": {
+            "account": "gcr",
+            "fromTrigger": true,
+            "organization": "PROJECT",
+            "registry": "gcr.io",
+            "repository": "PROJECT/teammates",
+            "tag": "v.*"
+          },
+          "name": "1494826281215",
+          "volumeMounts": []
+        }
+      ],
+      "credentials": "local",
+      "dnsPolicy": "ClusterFirst",
+      "labels": {},
+      "name": "Run Tests",
+      "namespace": "default",
+      "refId": "7",
+      "requisiteStageRefIds": [
+        "3"
+      ],
+      "type": "runJob",
+      "volumeSources": []
+    },
+    {
+      "failPipeline": true,
+      "instructions": "Do you want to deploy this image to production?",
+      "judgmentInputs": [],
+      "name": "Push to Production?",
+      "notifications": [],
+      "refId": "11",
+      "requisiteStageRefIds": [
+        "7"
+      ],
+      "type": "manualJudgment"
+    },
+    {
+      "clusters": [
+        {
+          "account": "local",
+          "application": "teammates",
+          "cloudProvider": "kubernetes",
+          "containers": [
+            {
+              "args": [],
+              "command": [],
+              "envFrom": [],
+              "envVars": [
+                {
+                  "name": "COMPONENT",
+                  "value": "backend"
+                },
+                {
+                  "name": "VERSION",
+                  "value": "${ trigger['tag'] }"
+                }
+              ],
+              "imageDescription": {
+                "account": "gcr",
+                "fromTrigger": true,
+                "imageId": "gcr.io/PROJECT/teammates:v.*",
+                "registry": "gcr.io",
+                "repository": "PROJECT/teammates",
+                "tag": "v.*"
+              },
+              "imagePullPolicy": "ALWAYS",
+              "name": "PROJECT-teammates",
+              "ports": [
+                {
+                  "containerPort": 80,
+                  "name": "http",
+                  "protocol": "TCP"
+                }
+              ],
+              "volumeMounts": []
+            }
+          ],
+          "deployment": {
+            "deploymentStrategy": {
+              "rollingUpdate": {
+                "maxSurge": "100%",
+                "maxUnavailable": "0%"
+              },
+              "type": "RollingUpdate"
+            },
+            "enabled": true,
+            "minReadySeconds": 0,
+            "paused": false,
+            "revisionHistoryLimit": 2
+          },
+          "dnsPolicy": "ClusterFirst",
+          "events": [],
+          "freeFormDetails": "",
+          "initContainers": [],
+          "interestingHealthProviderNames": [
+            "KubernetesContainer",
+            "KubernetesPod"
+          ],
+          "loadBalancers": [
+            "teammates-prod"
+          ],
+          "namespace": "default",
+          "nodeSelector": {},
+          "podAnnotations": {},
+          "provider": "kubernetes",
+          "region": "default",
+          "replicaSetAnnotations": {
+            "deployment.kubernetes.io/desired-replicas": "4",
+            "deployment.kubernetes.io/max-replicas": "8",
+            "deployment.kubernetes.io/revision": "31"
+          },
+          "securityGroups": [],
+          "stack": "prod",
+          "strategy": "",
+          "targetSize": 1,
+          "terminationGracePeriodSeconds": 30,
+          "volumeSources": []
+        }
+      ],
+      "name": "Deploy Prod",
+      "refId": "12",
+      "requisiteStageRefIds": [
+        "11"
+      ],
+      "type": "deploy"
+    }
+  ],
+  "triggers": [
+    {
+      "account": "gcr",
+      "application": "gceme",
+      "enabled": true,
+      "fromTrigger": true,
+      "organization": "PROJECT",
+      "pipeline": "61372c70-62af-422f-9565-e1975a758612",
+      "registry": "gcr.io",
+      "repository": "PROJECT/teammates",
+      "status": [
+        "successful"
+      ],
+      "tag": "v.*",
+      "type": "docker"
+    }
+  ],
+  "updateTs": "1529480568308"
+}
